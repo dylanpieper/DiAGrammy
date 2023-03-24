@@ -2,7 +2,6 @@
 Meet DiAGrammy, the bot who turns your words into diagrams! Powered by GPT 3.5.
 
 ## Development goals 
-- Print "bad" unexcecuted code for debugging 🐞
 - Event handler for missing or bad API key 🔑 
 - Edit diagram mode ✍️ 
 - Edit system prompt 🛠
