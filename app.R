@@ -20,7 +20,7 @@ waiting_screen_1 <- tagList(
 
 waiting_screen_2 <- tagList(
   spin_flower(),
-  h4("DiAGrammy is coding your graph using DiagrammeR...")
+  h4("DiAGrammy is coding your diagram using DiagrammeR...")
 ) 
 
 shinyApp(
@@ -91,7 +91,7 @@ shinyApp(
       chatter.create(max_tokens = 1000)
       
       prompt1 <- "You are ConnectGPT, a large language model trained to describe of a directed acyclic graph. Based on the user’s topic, you will understand the connections between the nodes of the system and explain them in excruciating detail."
-      prompt2 <- "You are DiagramGPT, a large language model trained to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylized flowchart diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure(). Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text more readable. Remove \\ from } \\"
+      prompt2 <- "You are DiagramGPT, a large language model trained to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylish diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure() or list. Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Remove \\ from } \\"
       
       chatter.feed(prompt1)
       completion1 <- chatter.chat(input$complete, return_response=TRUE)
@@ -109,9 +109,11 @@ shinyApp(
       
       if(any(class(error) == "try-error")){
         output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, I could not evaluate the R code. As an experimental bot, I'm not perfect at writing code. Please try again.</p></b>"))
+        output$code <- renderPrint(parse(text = completion2_clean))
+        show("clip")
       }else{
         output$diagram <- renderUI(eval(parse(text = completion2_clean)))
-        output$code <- renderPrint(parse(text = completion2_clean)) # Fix: returns expression; Add feature: copy and paste
+        output$code <- renderPrint(parse(text = completion2_clean))
         show("clip")
         show("down")
         
