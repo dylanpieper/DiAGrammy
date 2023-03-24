@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 library(shinyFiles)
 library(shinyalert)
 library(shinyWidgets)
@@ -6,8 +7,11 @@ library(shinydashboard)
 library(shinydashboardPlus)
 library(gptchatteR)
 library(DiagrammeR)
+library(rsvg)
 library(DiagrammeRsvg)
 library(waiter)
+library(magrittr)
+library(rclipboard)
 
 waiting_screen_1 <- tagList(
   spin_flower(),
@@ -24,6 +28,8 @@ shinyApp(
     dashboardHeader(disable = TRUE),
     dashboardSidebar(disable = TRUE, collapsed = TRUE, minified = FALSE, width = "0px"),
     dashboardBody(
+      useShinyjs(),
+      rclipboardSetup(),
       useWaiter(),
       fluidRow(
         box(
@@ -55,6 +61,8 @@ shinyApp(
           "Don't mind me, I'm just dreaming about diagrams.",
           htmlOutput("diagram"),
           verbatimTextOutput("code"),
+          hidden(uiOutput("clip")),
+          hidden(downloadButton(outputId = "down", label = "PNG")),
           footer = tags$a("Please visit my repository to learn more.", href="https://github.com/dylanpieper/DiAGrammy")
         ),
       ),
@@ -64,7 +72,7 @@ shinyApp(
   server = function(input, output) {
     # Show the alert on startup of the app
     observe({
-      shinyalert(title = "Set your OpenAI API Key",
+      shinyalert(title = "OpenAI API Key",
                  type = "input",
                  inputId = "API",
                  confirmButtonText = "Set",
@@ -83,7 +91,7 @@ shinyApp(
       chatter.create(max_tokens = 1000)
       
       prompt1 <- "You are ConnectGPT, a large language model trained by OpenAI to provide a written description of a directed acyclic graph. Based on the user’s topic, you will understand the connections between the nodes of the system and explain them in excruciating detail."
-      prompt2 <- "You are DiagramGPT, a large language model trained by OpenAI to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylized flowchart diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text more readable. Remove \\ from } \\"
+      prompt2 <- "You are DiagramGPT, a large language model trained by OpenAI to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylized flowchart diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure(). Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text more readable. Remove \\ from } \\"
       
       chatter.feed(prompt1)
       completion1 <- chatter.chat(input$complete, return_response=TRUE)
@@ -100,10 +108,34 @@ shinyApp(
       error <- try(eval(parse(text = completion2_clean)), silent = TRUE)
       
       if(any(class(error) == "try-error")){
-        output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry...I could not evaluate the R code. Please try again.</p></b>"))
+        output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, I could not evaluate the R code. As an experimental bot, I'm not perfect at writing code. Please try again.</p></b>"))
       }else{
         output$diagram <- renderUI(eval(parse(text = completion2_clean)))
         output$code <- renderPrint(parse(text = completion2_clean)) # Fix: returns expression; Add feature: copy and paste
+        show("clip")
+        show("down")
+        
+        # Add clipboard buttons
+        output$clip <- renderUI({
+          output$clip <- renderUI({
+            rclipButton(
+              inputId = "clipbtn",
+              label = "Copy code",
+              clipText = parse(text = completion2_clean), 
+              icon = icon("clipboard")
+            )
+          })
+        })
+        
+        output$down <- downloadHandler(
+          filename =  paste("DiAGrammy", Sys.time(), ".png"),
+          
+          content = function(file) {
+            graph <- eval(parse(text = completion2_clean))
+            graph %>% export_svg %>% charToRaw %>% rsvg_png(file)
+          } 
+        )
+        
       }
       
       waiter_hide()
