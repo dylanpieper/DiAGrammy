@@ -5,13 +5,13 @@ library(shinyalert)
 library(shinyWidgets)
 library(shinydashboard)
 library(shinydashboardPlus)
-library(gptchatteR)
-library(DiagrammeR)
 library(rsvg)
-library(DiagrammeRsvg)
 library(waiter)
 library(magrittr)
 library(rclipboard)
+library(gptchatteR)
+library(DiagrammeR)
+library(DiagrammeRsvg)
 
 waiting_screen_1 <- tagList(
   spin_flower(),
@@ -90,8 +90,8 @@ shinyApp(
       
       chatter.create(max_tokens = 1000)
       
-      prompt1 <- "You are ConnectGPT, a large language model trained by OpenAI to provide a written description of a directed acyclic graph. Based on the user’s topic, you will understand the connections between the nodes of the system and explain them in excruciating detail."
-      prompt2 <- "You are DiagramGPT, a large language model trained by OpenAI to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylized flowchart diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure(). Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text more readable. Remove \\ from } \\"
+      prompt1 <- "You are ConnectGPT, a large language model trained to describe of a directed acyclic graph. Based on the user’s topic, you will understand the connections between the nodes of the system and explain them in excruciating detail."
+      prompt2 <- "You are DiagramGPT, a large language model trained to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylized flowchart diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure(). Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text more readable. Remove \\ from } \\"
       
       chatter.feed(prompt1)
       completion1 <- chatter.chat(input$complete, return_response=TRUE)
