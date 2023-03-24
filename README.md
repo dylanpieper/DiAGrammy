@@ -10,4 +10,4 @@ Meet DiAGrammy, the bot who turns your words into diagrams! I am powered by GPT 
 - Event handler for missing or bad API key 🔑 
 
 ## Major events
-- Release 3/23/23
+- Release (3/23/23; developed on the same day)
