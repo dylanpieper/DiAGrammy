@@ -1,5 +1,5 @@
 # DiAGrammy
-Hi, I'm DiAGrammy, the bot who turns your words into diagrams! I'm powered by GPT 3.5.
+Meet DiAGrammy, the bot who turns your words into diagrams! Powered by GPT 3.5.
 
 ## Development goals 
 - [✅] Save as PNG (3/24/2023)
