@@ -15,7 +15,7 @@ library(DiagrammeRsvg)
 
 waiting_screen_1 <- tagList(
   spin_flower(),
-  h4("DiAGrammy is analyzing your request in excruciating detail...")
+  h4("DiAGrammy is analyzing your request...")
 )
 
 waiting_screen_2 <- tagList(
@@ -35,7 +35,7 @@ shinyApp(
         box(
           title = "Request a Diagram", status = "primary", solidHeader = TRUE,
           textAreaInput("complete", "What type of diagram are you looking for?"),
-          selectInput("prompt", "Select diagram template (experimental)", choices = c("freeform", "linear", "heirarchical", "cyclical", "mediation")),
+          selectInput("prompt", "Select diagram template (optional)", choices = c("freeform", "linear", "heirarchical", "cyclical", "mediation")),
           actionBttn(
             inputId = "gpt",
             label = "Request",
