@@ -16,12 +16,12 @@ library(DiagrammeRsvg)
 waiting_screen_1 <- tagList(
   spin_flower(),
   h4("DiAGrammy is analyzing your request in excruciating detail...")
-) 
+)
 
 waiting_screen_2 <- tagList(
   spin_flower(),
   h4("DiAGrammy is coding your diagram using DiagrammeR...")
-) 
+)
 
 shinyApp(
   ui = dashboardPage(
@@ -35,6 +35,7 @@ shinyApp(
         box(
           title = "Request a Diagram", status = "primary", solidHeader = TRUE,
           textAreaInput("complete", "What type of diagram are you looking for?"),
+          selectInput("prompt", "Select diagram template (experimental)", choices = c("freeform", "linear", "heirarchical", "cyclical", "mediation")),
           actionBttn(
             inputId = "gpt",
             label = "Request",
@@ -63,7 +64,7 @@ shinyApp(
           verbatimTextOutput("code"),
           hidden(uiOutput("clip")),
           hidden(downloadButton(outputId = "down", label = "PNG")),
-          footer = tags$a("Please visit my repository to learn more.", href="https://github.com/dylanpieper/DiAGrammy")
+          footer = tags$a("Please visit my repository to learn more.", href = "https://github.com/dylanpieper/DiAGrammy")
         ),
       ),
     ),
@@ -72,76 +73,88 @@ shinyApp(
   server = function(input, output) {
     # Show the alert on startup of the app
     observe({
-      shinyalert(title = "OpenAI API Key",
-                 type = "input",
-                 inputId = "API",
-                 confirmButtonText = "Set",
-                 closeOnEsc = FALSE,
-                 closeOnClickOutside = FALSE,
-                 callbackR = function(x) {
-                   chatter.auth(x)
-                 })
+      shinyalert(
+        title = "OpenAI API Key",
+        type = "input",
+        inputId = "API",
+        confirmButtonText = "Set",
+        closeOnEsc = FALSE,
+        closeOnClickOutside = FALSE,
+        callbackR = function(x) {
+          chatter.auth(x)
+        }
+      )
     })
-    
+
     # Ask GPT to write R code
     observeEvent(input$gpt, {
-      
       waiter_show(html = waiting_screen_1, color = "black")
-      
+
       chatter.create(max_tokens = 1000)
+
+      prompt1 <- "As ConnectGPT, you describe a directed acyclic graph based on a user’s topic. You will connect the nodes in the system and explain the directionality between them in excruciating detail."
       
-      prompt1 <- "You are ConnectGPT, a large language model trained to describe of a directed acyclic graph. Based on the user’s topic, you will understand the connections between the nodes of the system and explain them in excruciating detail."
-      prompt2 <- "You are DiagramGPT, a large language model trained to provide coding assistance in R. You use the `DiagrammeR::grViz` function to generate code for stylish diagrams based on text input. You will only print one markdown source code pane with no comments, headers, or context. Do not use a piping approach using %>%. Do not return a structure() or list. Be careful to format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Remove \\ from } \\"
-      
+      if (input$prompt == "freeform") {
+        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph model { ... }\")"
+      } else if (input$prompt == "linear") {
+        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request}\")"
+      } else if (input$prompt == "heirarchical"){
+        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph heirarchy_model {  node[shape = box]  CEO -> Manager1  CEO -> Manager2  CEO -> Manager3  Manager1 -> Team1  Manager1 -> Team2  Manager2 -> Team3  Manager2 -> Team4  Manager3 -> Team5  Team1 -> Employee1  Team1 -> Employee2  Team2 -> Employee3  Team2 -> Employee4  Team3 -> Employee5  Team3 -> Employee6  Team4 -> Employee7  Team4 -> Employee8  Team5 -> Employee9  Team5 -> Employee10}\")"
+      } else if (input$prompt == "cyclical"){
+        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph cyclical_model { Birth -> Growth; Growth -> Maturity; Maturity -> Reproduction; Reproduction -> Death; Reproduction -> Birth; }\")"
+      } else if (input$prompt == "mediation") {
+        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request    edge[dir = 'none', arrowhead = 'vee', fontsize = 12]  example -> request}\")"
+      }
+
       chatter.feed(prompt1)
-      completion1 <- chatter.chat(input$complete, return_response=TRUE)
-      
+      completion1 <- chatter.chat(input$complete, return_response = TRUE)
+
       waiter_show(html = waiting_screen_2, color = "black")
-      
+
       chatter.create(max_tokens = 1000)
-      
+
       chatter.feed(prompt2)
-      completion2 <- chatter.chat(completion1$choices[[1]], return_response=TRUE)
+      completion2 <- chatter.chat(completion1$choices[[1]], return_response = TRUE)
       completion2_extract <- completion2$choices[[1]]
       completion2_clean <- gsub("```|\\{r\\}|library\\(DiagrammeR\\)|<pre>|\\n", "", completion2_extract)
-      
+
       error <- try(eval(parse(text = completion2_clean)), silent = TRUE)
-      
-      if(any(class(error) == "try-error")){
-        output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, I could not evaluate the R code. As an experimental bot, I'm not perfect at writing code. Please try again.</p></b>"))
+
+      if (any(class(error) == "try-error")) {
+        output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, I wrote R code that won't run. Please try again.</p></b>"))
         output$code <- renderPrint(parse(text = completion2_clean))
         show("clip")
-      }else{
+      } else {
         output$diagram <- renderUI(eval(parse(text = completion2_clean)))
         output$code <- renderPrint(parse(text = completion2_clean))
         show("clip")
         show("down")
-        
+
         # Add clipboard buttons
         output$clip <- renderUI({
           output$clip <- renderUI({
             rclipButton(
               inputId = "clipbtn",
               label = "Copy code",
-              clipText = parse(text = completion2_clean), 
+              clipText = parse(text = completion2_clean),
               icon = icon("clipboard")
             )
           })
         })
-        
+
         output$down <- downloadHandler(
-          filename =  paste("DiAGrammy", Sys.time(), ".png"),
-          
+          filename = paste("DiAGrammy", Sys.time(), ".png"),
           content = function(file) {
             graph <- eval(parse(text = completion2_clean))
-            graph %>% export_svg %>% charToRaw %>% rsvg_png(file)
-          } 
+            graph %>%
+              export_svg() %>%
+              charToRaw() %>%
+              rsvg_png(file)
+          }
         )
-        
       }
-      
-      waiter_hide()
 
+      waiter_hide()
     })
-    
-})
+  }
+)
