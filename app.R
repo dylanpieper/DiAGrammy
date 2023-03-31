@@ -34,8 +34,10 @@ shinyApp(
       fluidRow(
         box(
           title = "Request a Diagram", status = "primary", solidHeader = TRUE,
-          textAreaInput("complete", "What type of diagram are you looking for?"),
-          selectInput("prompt", "Select diagram template (optional)", choices = c("freeform", "linear", "heirarchical", "cyclical", "mediation")),
+          textAreaInput("complete", "What type of diagram are you looking for?", placeholder = "the water cycle [8]"),
+          "[n] = number of nodes",
+          br(),br(),
+          selectInput("prompt", "Select diagram template", choices = c("specify nodes", "freeform", "linear", "heirarchical", "cyclical", "mediation")),
           actionBttn(
             inputId = "gpt",
             label = "Request",
@@ -92,18 +94,20 @@ shinyApp(
 
       chatter.create(max_tokens = 1000)
 
-      prompt1 <- "As ConnectGPT, you describe a directed acyclic graph based on a user’s topic. You will connect the nodes in the system and explain the directionality between them in excruciating detail."
+      prompt1 <- "Describe a directed acyclic graph based on a user’s topic. The diagram should have at least n nodes. I specify n in my input by writing [n], less than 10 being the default value. Connect the nodes in the system and explain the directionality between them in excruciating detail. Reiterate the user's topic and n number of nodes (example: \"topic [n]\")."
       
-      if (input$prompt == "freeform") {
-        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph model { ... }\")"
+      if (input$prompt == "specify nodes") {
+        prompt2 <- "Act as a Graphviz DOT generator who creates stylish and meaningful diagrams. Use the `DiagrammeR::grViz` function in R to code the diagrams. The diagram should have at least n nodes. I specify n in my input by writing [n], less than 10 being the default value (example: \"The water cycle [8]\"). Each node is indexed by a number to reduce the size of the output, should not include any styling. Use layout=neato, overlap=false, node [shape=rectangle] as parameters. The code should be valid, bugless. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Example code: grViz(\"digraph model { ... }\")"
+      } else if (input$prompt == "freeform") {
+        prompt2 <- "Use the `DiagrammeR::grViz` function in R to code stylish and meaningful diagrams. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph model { ... }\")"
       } else if (input$prompt == "linear") {
-        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request}\")"
+        prompt2 <- "Use the `DiagrammeR::grViz` function in R to code stylish and meaningful diagrams. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request}\")"
       } else if (input$prompt == "heirarchical"){
-        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph heirarchy_model {  node[shape = box]  CEO -> Manager1  CEO -> Manager2  CEO -> Manager3  Manager1 -> Team1  Manager1 -> Team2  Manager2 -> Team3  Manager2 -> Team4  Manager3 -> Team5  Team1 -> Employee1  Team1 -> Employee2  Team2 -> Employee3  Team2 -> Employee4  Team3 -> Employee5  Team3 -> Employee6  Team4 -> Employee7  Team4 -> Employee8  Team5 -> Employee9  Team5 -> Employee10}\")"
+        prompt2 <- "Use the `DiagrammeR::grViz` function in R to code stylish and meaningful diagrams. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph heirarchy_model {  node[shape = box]  CEO -> Manager1  CEO -> Manager2  CEO -> Manager3  Manager1 -> Team1  Manager1 -> Team2  Manager2 -> Team3  Manager2 -> Team4  Manager3 -> Team5  Team1 -> Employee1  Team1 -> Employee2  Team2 -> Employee3  Team2 -> Employee4  Team3 -> Employee5  Team3 -> Employee6  Team4 -> Employee7  Team4 -> Employee8  Team5 -> Employee9  Team5 -> Employee10}\")"
       } else if (input$prompt == "cyclical"){
-        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph cyclical_model { Birth -> Growth; Growth -> Maturity; Maturity -> Reproduction; Reproduction -> Death; Reproduction -> Birth; }\")"
+        prompt2 <- "Use the `DiagrammeR::grViz` function in R to code stylish and meaningful diagrams. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph cyclical_model { Birth -> Growth; Growth -> Maturity; Maturity -> Reproduction; Reproduction -> Death; Reproduction -> Birth; }\")"
       } else if (input$prompt == "mediation") {
-        prompt2 <- "As DiagramGPT, you use the `DiagrammeR::grViz` function in R to code stylish diagrams. You will only print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request    edge[dir = 'none', arrowhead = 'vee', fontsize = 12]  example -> request}\")"
+        prompt2 <- "Use the `DiagrammeR::grViz` function in R to code stylish and meaningful diagrams. Print one markdown source code pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph mediation_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request    edge[dir = 'none', arrowhead = 'vee', fontsize = 12]  example -> request}\")"
       }
 
       chatter.feed(prompt1)
