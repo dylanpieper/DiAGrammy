@@ -1,19 +1,7 @@
-library(httr)
-library(shiny)
-library(shinyjs)
-library(shinyFiles)
-library(shinyalert)
-library(shinyWidgets)
-library(shinydashboard)
-library(shinydashboardPlus)
-library(shinyStorePlus)
-library(rsvg)
-library(waiter)
-library(magrittr)
-library(rclipboard)
-library(gptchatteR)
-library(DiagrammeR)
-library(DiagrammeRsvg)
+pacman::p_load(
+  shiny, shinyjs, shinyFiles, shinyalert, shinyWidgets, shinydashboard, shinydashboardPlus, shinyStorePlus,
+  httr, rsvg, waiter, magrittr, rclipboard, gptchatteR, DiagrammeR, DiagrammeRsvg
+)
 
 waiting_screen_1 <- tagList(
   spin_flower(),
@@ -118,7 +106,6 @@ shinyApp(
     ),
     title = "DiAGrammy"
   ),
-
   server = function(input, output) {
     observeEvent(input$gpt, {
       if (is.null(input$API) || input$API == "") {
@@ -134,10 +121,10 @@ shinyApp(
         waiter_show(html = waiting_screen_1, color = "black")
 
         res <- httr::GET("https://api.openai.com/v1/engines/davinci/completions", add_headers(Authorization = paste0("Bearer ", input$API)))
-        
+
         if (res$status_code == 401) {
           waiter_hide()
-          
+
           output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, your API key was invalid. Please try again.</p></b>"))
         } else {
           chatter.auth(input$API)
@@ -161,19 +148,12 @@ shinyApp(
           }
 
           chatter.feed(prompt1)
-
           completion1 <- chatter.chat(input$complete, return_response = TRUE)
-
           waiter_show(html = waiting_screen_2, color = "black")
-
           chatter.create(max_tokens = 1000)
-
           chatter.feed(prompt2)
-
           completion2 <- chatter.chat(completion1$choices[[1]], return_response = TRUE)
-
           completion2_extract <- completion2$choices[[1]]
-          
           completion2_clean <- gsub("```|\\{r\\}|library\\(DiagrammeR\\)|<pre>|\\n", "", completion2_extract)
 
           error <- try(eval(parse(text = completion2_clean)), silent = TRUE)
