@@ -1,6 +1,5 @@
 library(httr)
 library(shiny)
-library(shinyBS)
 library(shinyjs)
 library(shinyFiles)
 library(shinyalert)
