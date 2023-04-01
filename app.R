@@ -34,7 +34,7 @@ shinyApp(
       fluidRow(
         box(
           title = "Request a Diagram", status = "primary", solidHeader = TRUE,
-          textAreaInput("complete", "What type of diagram are you looking for?", placeholder = "the water cycle [8]"),
+          textAreaInput("complete", "What type of diagram are you looking for?", placeholder = "structure of reality [8]"),
           "[n] is the number of nodes (default is < 10)",
           br(),br(),
           selectInput("prompt", "Select diagram template", choices = c("specify nodes", "freeform", "linear", "heirarchical", "cyclical", "mediation")),
