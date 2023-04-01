@@ -1,11 +1,12 @@
 # DiAGrammy
-Meet DiAGrammy, the bot who turns your words into diagrams! Powered by GPT 3.5.
+Meet DiAGrammy, the bot who turns your words into diagrams! Powered by text-davinci-003.
 
 ## Development goals 
+- Inputs for model selection, temperature, and max toxens. 🕹️
 - Event handler for missing or bad API key 🔑 
-- Edit diagram mode ✍️ 
-- Edit system prompts 🛠
+- Format/stylize/color diagram mode ✍️ 
 - Optimize diagram to fit on mobile 📲
+- Modify system prompts in the app 🛠
 - [✅] Save as PNG (3/24/2023)
 - [✅] Copy and paste code (3/24/2023)
 
