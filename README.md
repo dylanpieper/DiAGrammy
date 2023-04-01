@@ -2,12 +2,12 @@
 Meet DiAGrammy, the bot who turns your words into diagrams! Powered by graphviz DOT (via R package `DiagrammeR`), text-davinci-003 (via R package `gptchatteR`), and Shiny.
 
 ## Development goals 
-- Persistant browser storage for API key 🔑
-- Event handler for missing or bad API key 🔑 
 - Toggle "edit" and prompt will format/stylize/color current diagram ✍️ 
-- Settings panel with inputs for model selection, temperature, and max toxens 🕹️
 - Settings panel with inputs for modifying system prompts in the app 🛠
 - Optimize diagram to fit on mobile 📲
+- [✅] Persistant browser storage for API key (4/1/2023)
+- [✅] Event handler for missing or invalid API key (4/1/2023)
+- [✅] Settings panel with inputs for model temperature and max toxens (4/1/2023)
 - [✅] Save as PNG (3/24/2023)
 - [✅] Copy and paste code (3/24/2023)
 
