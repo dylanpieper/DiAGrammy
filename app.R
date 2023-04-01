@@ -138,6 +138,7 @@ shinyApp(
         
         if (res$status_code == 401) {
           waiter_hide()
+          
           output$diagram <- renderUI(HTML("<br> <b><p style='color: red;'>Sorry, your API key was invalid. Please try again.</p></b>"))
         } else {
           chatter.auth(input$API)
@@ -173,6 +174,7 @@ shinyApp(
           completion2 <- chatter.chat(completion1$choices[[1]], return_response = TRUE)
 
           completion2_extract <- completion2$choices[[1]]
+          
           completion2_clean <- gsub("```|\\{r\\}|library\\(DiagrammeR\\)|<pre>|\\n", "", completion2_extract)
 
           error <- try(eval(parse(text = completion2_clean)), silent = TRUE)
