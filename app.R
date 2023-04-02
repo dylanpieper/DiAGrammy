@@ -1,6 +1,6 @@
 pacman::p_load(
   shiny, shinyjs, shinyFiles, shinyalert, shinyWidgets, shinydashboard, shinydashboardPlus, shinyStorePlus,
-  httr, rsvg, waiter, htmltools, magrittr, rclipboard, gptchatteR, DiagrammeR, DiagrammeRsvg
+  httr, rsvg, waiter, magrittr, rclipboard, gptchatteR, DiagrammeR, DiagrammeRsvg
 )
 
 waiting_screen_1 <- tagList(
@@ -38,9 +38,9 @@ shinyApp(
             width = 12,
             div(
               style = "display: flex; flex-direction: column; margin-bottom: 10px;",
-              tags$label("OpenAI API key:"),
               passwordInput(
-                inputId = "API",
+                inputId = "API", 
+                label = "OpenAI API key:", 
                 placeholder = ""
               ),
               tags$small(
