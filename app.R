@@ -140,7 +140,7 @@ shinyApp(
           } else if (input$prompt == "linear") {
             prompt2 <- "Use the `DiagrammeR::grViz` function in R to code meaningful linear diagrams. Print one line of code in one markdown source pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph linear_model {  graph[layout = dot]    node[shape = box, fontsize = 14]  example[label = 'Example Diagram']  gpt[label = 'GPT']  request[label = 'Requested Diagram']    edge[dir = 'forward', arrowhead = 'vee', fontsize = 12]  example -> gpt  gpt -> request}\")"
           } else if (input$prompt == "heirarchical") {
-            prompt2 <- "Use the `DiagrammeR::grViz` function in R to code meaningful heirarchical diagrams. Print one line of code in one markdown source pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph heirarchical_model {  node[shape = box]  CEO -> Manager1  CEO -> Manager2  CEO -> Manager3  Manager1 -> Team1  Manager1 -> Team2  Manager2 -> Team3  Manager2 -> Team4  Manager3 -> Team5  Team1 -> Employee1  Team1 -> Employee2  Team2 -> Employee3  Team2 -> Employee4  Team3 -> Employee5  Team3 -> Employee6  Team4 -> Employee7  Team4 -> Employee8  Team5 -> Employee9  Team5 -> Employee10}\")"
+            prompt2 <- "Use the `DiagrammeR::grViz` function in R to code meaningful diagrams. Print one line of code in one markdown source pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph model { 1 [label = 'Computers']; 2 [label = 'Desktops']; 3 [label = 'Laptops']; 4 [label = 'Monitors']; 5 [label = 'Printers']; 6 [label = 'Storage']; 7 [label = 'Hard Drives']; 8 [label = 'Solid State Drives']; 9 [label = 'Networking']; 10 [label = 'Routers']; 1 -> 2; 1 -> 3; 2 -> 4; 2 -> 5; 3 -> 6; 6 -> 7; 6 -> 8; 1 -> 9; 9 -> 10;}\")"
           } else if (input$prompt == "cyclical") {
             prompt2 <- "Use the `DiagrammeR::grViz` function in R to code meaningful cyclical diagrams. Print one line of code in one markdown source pane with no comments, headers, or context. Format node strings with no hyphens, punctuation, or special characters. Adjust the layout to make the text readable. Example: grViz(\"digraph cyclical_model { Birth -> Growth; Growth -> Maturity; Maturity -> Reproduction; Reproduction -> Death; Reproduction -> Birth; }\")"
           } else if (input$prompt == "mediation") {
@@ -150,7 +150,7 @@ shinyApp(
           chatter.feed(prompt1)
           completion1 <- chatter.chat(input$complete, return_response = TRUE)
           waiter_show(html = waiting_screen_2, color = "black")
-          chatter.create(max_tokens = 1000)
+          chatter.create(max_tokens = as.integer(input$max_tokens), temperature = as.integer(input$temperature))
           chatter.feed(prompt2)
           completion2 <- chatter.chat(completion1$choices[[1]], return_response = TRUE)
           completion2_extract <- completion2$choices[[1]]
